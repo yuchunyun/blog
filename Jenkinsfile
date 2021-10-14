@@ -1,12 +1,11 @@
 node('jnlp') {
-       stage('获取ID') {
-        echo "获取ID"
-        checkout scm
-        script {
-            commit_id = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-
+        stage('获取ID') {
+              echo "获取ID"
+              checkout scm
+              script {
+                     commit_id = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+              }
         }
-    }
         stage('构建镜像') {
       
                 echo '构建镜像'
