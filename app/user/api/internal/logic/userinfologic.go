@@ -39,6 +39,6 @@ func (ul *UserInfoLogic) UserInfo(req types.UserInfoRequest) (*types.UserInfoRes
 	return &types.UserInfoResponse{
 		Uid:   req.Uid,
 		Name:  name,
-		Level: 666,
+		Level: 999,
 	}, nil
 }
