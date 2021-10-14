@@ -1,12 +1,5 @@
 node('jnlp') {
 
-        stage('从gitlab拉取服务代码') {
-                echo '从gitlab拉取服务代码'
-                git credentialsId: 'gitlab_token', url: 'ssh://git@202.173.9.63:30022/yuchunyun/blog.git'
-                script {
-                    commit_id = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-            }
-        }
         stage('构建镜像') {
       
                 echo '构建镜像'
