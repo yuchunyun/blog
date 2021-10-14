@@ -1,0 +1,22 @@
+type UserInfoRequest {
+	Uid int64 `form:"uid"`
+}
+
+type UserInfoResponse {
+	Uid   int64  `json:"uid"`
+	Name  string `json:"name"`
+	Level int    `json:"level"`
+}
+
+@server(
+	port: 2233
+)
+service user-api {
+	@doc(
+		summary:  获取用户信息
+	)
+	@server(
+		handler:  UserInfo
+	)
+	get /user/info(UserInfoRequest) returns(UserInfoResponse)
+}

@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-api
+  namespace: blog
+  labels:
+    app: user-api
+spec:
+  replicas: 3
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: user-api
+  template:
+    metadata:
+      labels:
+        app: user-api
+    spec:
+      containers:
+      - name: user-api
+        image: docker.zdns.cn/devops/user:<COMMIT_ID_TAG>
+        lifecycle:
+          preStop:
+            exec:
+              command: ["sh","-c","sleep 5"]
+        ports:
+        - containerPort: 2233
+        readinessProbe:
+          tcpSocket:
+            port: 2233
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 2233
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 1024Mi
+        volumeMounts:
+        - name: timezone
+          mountPath: /etc/localtime
+      volumes:
+        - name: timezone
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-api-svc
+  namespace: blog
+spec:
+  ports:
+    - port: 2233
+  selector:
+    app: user-api
