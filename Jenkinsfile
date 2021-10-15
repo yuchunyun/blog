@@ -1,10 +1,22 @@
-node('jnlp') {
-        stage('获取ID') {
-              echo "获取ID"
-              checkout scm
-              script {
-                     commit_id = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-              }
+def label = "jenkins-slave-${UUID.randomUUID().toString()}"
+
+podTemplate(label: label, serviceAccount: 'jenkins', containers: [
+  containerTemplate(name: 'jnlp', image: 'cnych/jenkins:jnlp6', command: '', ttyEnabled: true)
+], volumes: [
+  hostPathVolume(mountPath: '/home/jenkins/.kube', hostPath: '/root/.kube'),
+  hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
+]) {
+  node(label) {
+    def myRepo = checkout scm
+    def gitCommit = myRepo.GIT_COMMIT
+    def gitBranch = myRepo.GIT_BRANCH
+
+    stage('从gitlab拉取服务代码') {
+                echo '从gitlab拉取服务代码'
+                checkout scm
+                script {
+                    commit_id = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+            }
         }
         stage('构建镜像') {
       
@@ -61,5 +73,7 @@ node('jnlp') {
                 }
                 sh "sed -i 's/<COMMIT_ID_TAG>/${commit_id}/' app/user/api/user.yaml"
                 sh "kubectl apply -f app/user/api/user.yaml"
+            
         }
+  }
 }
